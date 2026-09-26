@@ -3,7 +3,7 @@
 **Domain:** Digital commerce  
 **Channels:** Web, iOS, Android  
 **Primary launch market:** India  
-**Engagement phase:** Discovery and architecture definition
+**Engagement phase:** Architecture definition
 
 ## Engagement objective
 
@@ -27,6 +27,13 @@ The engagement is intentionally technology-neutral during discovery. Cloud and p
 
 ### Architecture
 - [Workload characteristics](architecture/01-workload-characteristics.md)
+- [Initial AWS platform HLD](architecture/02-initial-aws-platform-hld.md)
+- [Eraser system context](diagrams/00-system-context.eraserdiagram)
+- [Eraser AWS HLD](diagrams/01-initial-aws-platform-hld.eraserdiagram)
+
+### Governance
+- [Well-Architected review model](governance/01-well-architected-review-model.md)
+- [Service decision standard](governance/02-service-decision-standard.md)
 
 ### Decisions
 - [ADR register](adrs/README.md)
