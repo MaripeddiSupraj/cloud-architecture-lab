@@ -1,0 +1,29 @@
+sequence-diagram
+
+typeface clean
+styleMode shadow
+colorMode pastel
+autoNumber on
+
+Customer [icon: user] > Checkout [label: "Checkout & Orders"]: Submit checkout + Idempotency-Key
+Checkout > Database [icon: aws-rds, label: "PostgreSQL"]: Create order=PENDING_PAYMENT
+Checkout > Payment [label: "Payment Provider"]: Create payment
+Payment --> Checkout: Timeout / connection lost
+Checkout > Database: Mark payment=UNKNOWN
+Checkout --> Customer: Processing / do not create a second charge
+
+Payment > Callback [label: "Payment Callback Endpoint"]: Provider webhook with provider transaction id
+Callback > Database: Lookup order + deduplicate callback
+Database --> Callback: Current payment state
+Callback > Database: Transaction: set PAID + outbox event
+Database --> Callback: Commit
+
+Reconciler [label: "Payment Reconciliation Worker"] > Database: Find stale UNKNOWN payments
+Reconciler > Payment: Query provider by merchant reference
+Payment --> Reconciler: Authoritative payment status
+Reconciler > Database: Idempotent state transition / compensate if needed
+
+Customer > Checkout: Retry same Idempotency-Key
+Checkout > Database: Return existing order/payment state
+Database --> Checkout: Existing result
+Checkout --> Customer: Same order; never duplicate charge/order
