@@ -5,59 +5,63 @@ typeface clean
 styleMode shadow
 colorMode pastel
 
-Domain Services [color: green] {
-  Catalog [label: "Catalog & Pricing"]
-  Checkout [label: "Checkout & Orders"]
+Services [label: "Domain Services", color: green] {
+  Catalog [label: "Catalog and Pricing"]
+  Checkout [label: "Checkout and Orders"]
   Inventory [label: "Inventory"]
 }
 
-Authoritative State [color: purple] {
-  PostgreSQL [icon: aws-rds, label: "RDS PostgreSQL\nSystem of Record"]
+SystemOfRecord [label: "Authoritative State", color: purple] {
+  PostgreSQL [icon: aws-rds, label: "RDS PostgreSQL - System of Record"]
 }
 
-Transaction-to-Event Bridge [color: yellow] {
+EventPublishing [label: "Reliable Event Publishing", color: yellow] {
   Outbox [label: "Transactional Outbox"]
   Relay [label: "Outbox Relay"]
-  EventBridge [icon: aws-eventbridge]
+  EventBridge [icon: aws-eventbridge, label: "EventBridge"]
 }
 
-Consumer Buffers [color: orange] {
+Queues [label: "Consumer Buffers", color: orange] {
   SearchQueue [icon: aws-simple-queue-service, label: "Search Index Queue"]
   FulfilmentQueue [icon: aws-simple-queue-service, label: "Fulfilment Queue"]
   NotificationQueue [icon: aws-simple-queue-service, label: "Notification Queue"]
   AnalyticsQueue [icon: aws-simple-queue-service, label: "Analytics Queue"]
 }
 
-Derived / Ephemeral State [color: blue] {
-  Search [icon: aws-opensearch-service, label: "OpenSearch\nDerived Index"]
-  Cache [icon: aws-elasticache, label: "Valkey\nCache / Ephemeral"]
+DerivedState [label: "Derived and Ephemeral State", color: blue] {
+  Search [icon: aws-opensearch-service, label: "OpenSearch Derived Index"]
+  Cache [icon: aws-elasticache, label: "Valkey Cache"]
 }
 
-External [color: gray] {
-  ERP [label: "ERP / Warehouse"]
+ExternalConsumers [label: "External Consumers", color: gray] {
+  ERP [label: "ERP and Warehouse"]
   Notifications [label: "Messaging Providers"]
   Analytics [label: "Analytics Platform"]
 }
 
 Catalog > PostgreSQL: Catalog truth
-Checkout > PostgreSQL: Orders / payment state
-Inventory > PostgreSQL: Inventory / reservations
+Checkout > PostgreSQL: Orders and payment state
+Inventory > PostgreSQL: Inventory and reservations
 
-Catalog > Cache: Cache-aside
+Catalog > Cache: Cache aside reads
 Checkout > Cache: Safe ephemeral data
 
-PostgreSQL > Outbox: Same DB transaction
-Outbox > Relay: Poll / claim committed events
+PostgreSQL > Outbox: Commit state and event together
+Outbox > Relay: Read committed events
 Relay > EventBridge: Publish domain events
 
-EventBridge > SearchQueue, FulfilmentQueue, NotificationQueue, AnalyticsQueue: Route + fan-out
+EventBridge > SearchQueue: Route search events
+EventBridge > FulfilmentQueue: Route fulfilment events
+EventBridge > NotificationQueue: Route notification events
+EventBridge > AnalyticsQueue: Route analytics events
+
 SearchQueue > Search: Idempotent indexing
-FulfilmentQueue > ERP: Async integration
-NotificationQueue > Notifications: Async delivery
-AnalyticsQueue > Analytics: Async events
+FulfilmentQueue > ERP: Asynchronous integration
+NotificationQueue > Notifications: Asynchronous delivery
+AnalyticsQueue > Analytics: Asynchronous events
 
 legend [position: bottom-left] {
-  [color: purple, label: "Authoritative"]
-  [color: blue, label: "Derived / ephemeral"]
-  [connection: -->, label: "Request / event"]
+  [color: purple, label: "Authoritative state"]
+  [color: blue, label: "Derived or ephemeral state"]
+  [connection: -->, label: "Request or event"]
 }
