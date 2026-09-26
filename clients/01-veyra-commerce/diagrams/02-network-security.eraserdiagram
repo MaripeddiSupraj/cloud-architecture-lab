@@ -1,0 +1,85 @@
+cloud-architecture-diagram
+
+direction right
+typeface clean
+styleMode shadow
+colorMode pastel
+
+Internet [icon: globe, color: gray]
+
+AWS Edge [color: blue] {
+  DNS [label: "Route 53"]
+  CloudFront [icon: aws-cloudfront]
+  WAF [icon: aws-waf]
+}
+
+VPC [color: teal] {
+  Public Ingress [color: blue] {
+    ALB [label: "Public ALB"]
+    NAT_A [label: "NAT Gateway • AZ-A"]
+    NAT_B [label: "NAT Gateway • AZ-B"]
+    NAT_C [label: "NAT Gateway • AZ-C"]
+  }
+
+  Private Application [color: green] {
+    ECS_A [icon: aws-fargate, label: "ECS/Fargate • AZ-A"]
+    ECS_B [icon: aws-fargate, label: "ECS/Fargate • AZ-B"]
+    ECS_C [icon: aws-fargate, label: "ECS/Fargate • AZ-C"]
+  }
+
+  Isolated Data [color: purple] {
+    RDS [icon: aws-rds, label: "RDS PostgreSQL • Multi-AZ"]
+    Valkey [icon: aws-elasticache, label: "ElastiCache / Valkey"]
+    OpenSearch [icon: aws-opensearch-service]
+  }
+
+  Private AWS Access [color: yellow] {
+    S3Endpoint [label: "S3 Gateway Endpoint"]
+    PrivateEndpoints [label: "Interface Endpoints\nECR • Secrets • Logs"]
+  }
+}
+
+Security Services [color: red] {
+  Secrets [label: "Secrets Manager"]
+  KMS [label: "KMS"]
+  TaskRoles [label: "ECS Task IAM Roles"]
+  CloudTrail [label: "CloudTrail"]
+}
+
+External Providers [color: orange] {
+  Payment [label: "Payment Provider"]
+  ERP [label: "ERP / Warehouse"]
+  Messaging [label: "Email / SMS / Push"]
+}
+
+Internet > DNS > CloudFront > WAF > ALB: HTTPS
+ALB > ECS_A, ECS_B, ECS_C: App SG only
+
+ECS_A > RDS: PostgreSQL/TLS
+ECS_B > RDS: PostgreSQL/TLS
+ECS_C > RDS: PostgreSQL/TLS
+ECS_A > Valkey, OpenSearch
+ECS_B > Valkey, OpenSearch
+ECS_C > Valkey, OpenSearch
+
+ECS_A > S3Endpoint, PrivateEndpoints: Private AWS traffic
+ECS_B > S3Endpoint, PrivateEndpoints: Private AWS traffic
+ECS_C > S3Endpoint, PrivateEndpoints: Private AWS traffic
+
+TaskRoles > ECS_A, ECS_B, ECS_C: Short-lived AWS credentials
+Secrets > ECS_A, ECS_B, ECS_C: Runtime secrets
+KMS > RDS, Valkey, OpenSearch: Encryption controls
+
+ECS_A > NAT_A: Internet egress
+ECS_B > NAT_B: Internet egress
+ECS_C > NAT_C: Internet egress
+NAT_A > Payment, ERP, Messaging
+NAT_B > Payment, ERP, Messaging
+NAT_C > Payment, ERP, Messaging
+
+legend [position: bottom-left] {
+  [color: blue, label: "Public / edge"]
+  [color: green, label: "Private application"]
+  [color: purple, label: "Data"]
+  [color: red, label: "Security controls"]
+}
