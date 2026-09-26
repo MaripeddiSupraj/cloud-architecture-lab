@@ -19,12 +19,21 @@ The engagement is intentionally technology-neutral during discovery. Cloud and p
 - [Non-functional requirements](engagement/03-non-functional-requirements.md)
 - [Assumptions and constraints](engagement/04-assumptions-and-constraints.md)
 - [Scope and success criteria](engagement/05-scope-and-success-criteria.md)
+- [Discovery question register](engagement/06-open-questions.md)
+- [Architecture risk register](engagement/07-risk-register.md)
 
 ### Capacity
 - [Initial capacity model](capacity/01-initial-capacity-model.md)
 
+### Architecture
+- [Workload characteristics](architecture/01-workload-characteristics.md)
+
+### Decisions
+- [ADR register](adrs/README.md)
+- [ADR template](adrs/ADR-TEMPLATE.md)
+
 ## Architecture workstream
 
-The next phase will convert these requirements into workload classifications and architecture decisions. No compute platform, database, messaging technology, or cloud service is considered selected until its ADR is accepted.
+The next phase converts the requirements and workload model into explicit architecture decisions. No compute platform, database, messaging technology, or cloud service is considered selected until its ADR is accepted.
 
-Planned decision areas include application decomposition, compute, transactional storage, catalog/search, caching, eventing, checkout orchestration, inventory consistency, identity, networking, delivery strategy, observability, disaster recovery, and infrastructure-as-code.
+The first decision sequence is application decomposition, transactional boundaries, data ownership, compute, persistence, caching/search, asynchronous integration, and edge/API architecture. These decisions then drive networking, security, delivery, observability, recovery, and cost design.
