@@ -5,25 +5,25 @@ styleMode shadow
 colorMode pastel
 autoNumber on
 
-Customer [icon: user] > Checkout [label: "Checkout & Orders"]: Submit checkout + Idempotency-Key
-Checkout > Database [icon: aws-rds, label: "PostgreSQL"]: Create order=PENDING_PAYMENT
+Customer [icon: user, label: "Customer"] > Checkout [label: "Checkout and Orders"]: Submit checkout with idempotency key
+Checkout > Database [icon: aws-rds, label: "PostgreSQL"]: Create order in pending payment state
 Checkout > Payment [label: "Payment Provider"]: Create payment
-Payment --> Checkout: Timeout / connection lost
-Checkout > Database: Mark payment=UNKNOWN
-Checkout --> Customer: Processing / do not create a second charge
+Payment --> Checkout: Timeout or connection loss
+Checkout > Database: Mark payment outcome unknown
+Checkout --> Customer: Return processing status without creating another charge
 
-Payment > Callback [label: "Payment Callback Endpoint"]: Provider webhook with provider transaction id
-Callback > Database: Lookup order + deduplicate callback
-Database --> Callback: Current payment state
-Callback > Database: Transaction: set PAID + outbox event
-Database --> Callback: Commit
+Payment > Callback [label: "Payment Callback Endpoint"]: Send provider webhook with transaction identifier
+Callback > Database: Lookup order and deduplicate callback
+Database --> Callback: Return current payment state
+Callback > Database: Commit paid state and outbox event
+Database --> Callback: Commit complete
 
-Reconciler [label: "Payment Reconciliation Worker"] > Database: Find stale UNKNOWN payments
-Reconciler > Payment: Query provider by merchant reference
-Payment --> Reconciler: Authoritative payment status
-Reconciler > Database: Idempotent state transition / compensate if needed
+Reconciler [label: "Payment Reconciliation Worker"] > Database: Find stale unknown payments
+Reconciler > Payment: Query provider using merchant reference
+Payment --> Reconciler: Return authoritative payment status
+Reconciler > Database: Apply idempotent state transition or compensation
 
-Customer > Checkout: Retry same Idempotency-Key
-Checkout > Database: Return existing order/payment state
-Database --> Checkout: Existing result
-Checkout --> Customer: Same order; never duplicate charge/order
+Customer > Checkout: Retry with the same idempotency key
+Checkout > Database: Read existing order and payment state
+Database --> Checkout: Return existing result
+Checkout --> Customer: Return the same order without duplicate charge
