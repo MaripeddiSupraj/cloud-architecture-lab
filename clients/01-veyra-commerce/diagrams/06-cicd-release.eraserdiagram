@@ -5,34 +5,44 @@ typeface clean
 styleMode shadow
 colorMode pastel
 
-Developer [icon: user, color: gray]
+Developer [icon: user, label: "Developer", color: gray]
 PullRequest [label: "Pull Request", color: blue]
-Quality [label: "Lint + Unit + Contract Tests", color: blue]
-Security [label: "SAST + Secret + Dependency Scan", color: red]
+Quality [label: "Lint, Unit and Contract Tests", color: blue]
+Security [label: "SAST, Secret and Dependency Scan", color: red]
 Build [label: "Build Once", color: blue]
 Image [label: "Immutable Container Image", color: blue]
-Scan [label: "ECR / Image Scan", color: red]
+Scan [label: "ECR Image Scan", color: red]
 Artifact [label: "ECR Image Digest", color: purple]
 DeployDev [label: "Deploy DEV", color: green]
-Integration [label: "Integration + Security Tests", color: green]
+Integration [label: "Integration and Security Tests", color: green]
 DeployStage [label: "Deploy STAGE", color: green]
-Performance [label: "Load / Smoke / Migration Checks", color: green]
+Performance [label: "Load, Smoke and Migration Checks", color: green]
 Approval [label: "Production Policy Gate", shape: diamond, color: yellow]
 Prod [label: "ECS Production Deployment", color: orange]
-Observe [label: "SLO + Error + Business Alarms", color: orange]
-Success [label: "Promote / Complete", color: green]
-Rollback [label: "Automatic / Operator Rollback", color: red]
+Observe [label: "SLO, Error and Business Alarms", color: orange]
+Success [label: "Promotion Complete", color: green]
+Rollback [label: "Automatic or Operator Rollback", color: red]
 
-Developer > PullRequest > Quality > Security > Build > Image > Scan > Artifact
-Artifact > DeployDev > Integration > DeployStage > Performance > Approval
+Developer > PullRequest
+PullRequest > Quality
+Quality > Security
+Security > Build
+Build > Image
+Image > Scan
+Scan > Artifact
+Artifact > DeployDev
+DeployDev > Integration
+Integration > DeployStage
+DeployStage > Performance
+Performance > Approval
 Approval > Prod: Approved
 Prod > Observe
 Observe > Success: Healthy
-Observe > Rollback: Alarm / failed health
+Observe > Rollback: Alarm or failed health
 Rollback > Artifact: Previous known-good digest
 
 legend [position: bottom-left] {
-  [color: red, label: "Security / failure"]
-  [color: green, label: "Validation / healthy"]
+  [color: red, label: "Security or failure"]
+  [color: green, label: "Validation or healthy"]
   [color: orange, label: "Production"]
 }
