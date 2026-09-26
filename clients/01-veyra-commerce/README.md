@@ -51,8 +51,15 @@ The diagram set includes system context, AWS HLD, network/security, checkout/pay
 ## Performance and cost
 
 - [Initial capacity model](capacity/01-initial-capacity-model.md)
+- [Traffic breakdown](capacity/02-traffic-breakdown.md)
+- [ECS service sizing](capacity/03-service-sizing.md)
+- [Database capacity and connection model](capacity/04-database-capacity.md)
+- [Data transfer and telemetry model](capacity/05-data-transfer-and-telemetry.md)
+- [Capacity validation review](reviews/02-capacity-validation.md)
 - [Peak event readiness](performance/01-peak-event-readiness.md)
 - [FinOps cost model and guardrails](finops/01-cost-model-and-guardrails.md)
+- [AWS pricing workbook](finops/02-pricing-workbook.md)
+- [Cost optimization decisions](finops/03-cost-optimization-decisions.md)
 
 ## Architecture principle
 
@@ -61,4 +68,4 @@ No box exists on a diagram merely because it is a popular AWS service.
 For every major component the repository records:
 **requirement -> workload -> options -> trade-offs -> decision -> validation -> revisit trigger**.
 
-The next design maturity step is implementation-level sizing and pricing: per-domain traffic distribution, representative ECS resource benchmarks, database connection/IO profile, CDN transfer/cache ratio, search/cache load, telemetry volume, and a dated Mumbai/Hyderabad AWS pricing estimate.
+The capacity model now contains a first numerical workload envelope and service-sizing hypothesis. The next evidence gate is **benchmark + calculator validation**: representative ECS load tests, PostgreSQL connection/IO tests, OpenSearch and Valkey benchmarks, media/CDN transfer measurement, Cognito feature-tier confirmation, and an AWS Pricing Calculator estimate for Mumbai/Hyderabad. Those measurements may change accepted sizing or even reopen an ADR.
