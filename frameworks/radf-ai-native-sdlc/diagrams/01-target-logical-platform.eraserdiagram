@@ -1,0 +1,92 @@
+cloud-architecture-diagram
+
+direction right
+typeface clean
+styleMode shadow
+colorMode pastel
+
+Entry [label: "Entry and Intent"] {
+  Console [label: "Control Console or API"]
+  SourceEvent [label: "Git, Ticket or CI Event"]
+}
+
+ReasoningPlane [label: "Reasoning Plane", color: blue] {
+  Planner [label: "Planner and Engineering Agents"]
+  ModelGateway [label: "Model Provider Gateway"]
+  ContextGateway [label: "Context and Knowledge Gateway"]
+}
+
+ControlPlane [label: "Control Plane", color: red] {
+  Workflow [label: "Durable Workflow"]
+  Policy [label: "Policy Decision Point"]
+  Identity [label: "Task Identity and Credential Broker"]
+  Approval [label: "Approval Service"]
+  ToolRegistry [label: "Tool and MCP Registry"]
+}
+
+ExecutionPlane [label: "Execution Plane", color: orange] {
+  Sandbox [label: "Ephemeral Isolated Worker"]
+  ToolGateway [label: "Tool and MCP Gateway"]
+}
+
+VerificationPlane [label: "Verification Plane", color: green] {
+  Checks [label: "Build, Tests and Security Checks"]
+  IndependentReview [label: "Independent Verification"]
+  ReleaseGate [label: "Artifact-bound Release Gate"]
+}
+
+EvidencePlane [label: "Evidence Plane", color: purple] {
+  EvidenceMetadata [label: "Evidence Metadata"]
+  ArtifactStore [label: "Evidence Artifacts"]
+  Telemetry [label: "Workflow, Agent and Cost Telemetry"]
+}
+
+EngineeringTargets [label: "Engineering Targets"] {
+  Git [label: "Git Provider"]
+  CI [label: "CI and Security Systems"]
+  Registry [label: "Artifact Registry"]
+  NonProd [label: "Non-production"]
+  Prod [label: "Production"]
+}
+
+Console > Workflow: Create governed task
+SourceEvent > Workflow: Trigger governed workflow
+
+Workflow > Planner: Request reasoning
+Planner > ModelGateway: Approved model invocation
+Planner > ContextGateway: Project-scoped context
+
+Workflow > Policy: Evaluate proposed action
+Policy > Identity: Grant scoped capability
+Identity > Sandbox: Issue short-lived task identity
+Workflow > Approval: Request human decision where required
+
+Workflow > Sandbox: Execute authorized step
+Sandbox > ToolGateway: Invoke registered tool
+ToolRegistry > ToolGateway: Approved tool contract
+ToolGateway > Git: Scoped repository action
+ToolGateway > CI: Scoped CI or scanner action
+
+CI > Checks: Deterministic results
+Checks > IndependentReview: Verified evidence
+IndependentReview > ReleaseGate: Trusted release candidate
+Approval > ReleaseGate: Bind authorization to candidate
+ReleaseGate > Registry: Promote exact artifact
+Registry > NonProd: Deploy verified artifact
+ReleaseGate > Prod: Authorized production action
+
+Workflow > EvidenceMetadata: Workflow transitions
+Policy > EvidenceMetadata: Allow and deny decisions
+Sandbox > EvidenceMetadata: Execution events
+ToolGateway > EvidenceMetadata: Tool calls
+Checks > ArtifactStore: Test and scan artifacts
+ReleaseGate > ArtifactStore: Provenance and release evidence
+EvidenceMetadata > Telemetry: Operational and cost signals
+
+legend [position: bottom-left] {
+  [color: blue, label: "Reasoning"]
+  [color: red, label: "Control"]
+  [color: orange, label: "Execution"]
+  [color: green, label: "Verification"]
+  [color: purple, label: "Evidence"]
+}
