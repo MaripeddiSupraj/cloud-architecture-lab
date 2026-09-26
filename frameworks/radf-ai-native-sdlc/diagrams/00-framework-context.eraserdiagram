@@ -1,0 +1,60 @@
+cloud-architecture-diagram
+
+direction right
+typeface clean
+styleMode shadow
+colorMode pastel
+
+HumanAccountability [label: "Human Accountability"] {
+  Engineer [label: "Engineer"]
+  Reviewer [label: "Reviewer or Approver"]
+  Operator [label: "Platform Operator"]
+}
+
+RADF [label: "RADF AI-Native SDLC Framework"] {
+  Intent [label: "Intent, Requirements and Policy"]
+  Reasoning [label: "AI Reasoning and Agents"]
+  Control [label: "Policy, Identity and Durable Control"]
+  Execution [label: "Constrained Execution"]
+  Verification [label: "Independent Verification"]
+  Release [label: "Governed Release"]
+  Evidence [label: "Evidence and Audit"]
+}
+
+EngineeringEnvironment [label: "Target Engineering Environment"] {
+  Git [label: "Git Repository"]
+  CI [label: "CI and Security Tools"]
+  Registry [label: "Artifact Registry"]
+  NonProd [label: "Non-production"]
+  Production [label: "Production"]
+}
+
+Providers [label: "Approved Providers"] {
+  Models [label: "Model Providers"]
+  Knowledge [label: "Project Context and Knowledge"]
+}
+
+Engineer > Intent: Approved engineering intent
+Intent > Reasoning: Task and constraints
+Reasoning > Models: Approved model call
+Reasoning > Knowledge: Project-scoped context
+Reasoning > Control: Proposed action
+Control > Execution: Authorized capability
+Execution > Git: Scoped engineering action
+Execution > CI: Trigger permitted checks
+CI > Verification: Deterministic results
+Verification > Release: Trusted candidate
+Control > Reviewer: Approval when required
+Reviewer > Release: Attributable authorization
+Release > Registry: Promote exact artifact
+Registry > NonProd: Verified deployment
+Release > Production: Authorized production deployment
+Control > Evidence: Policy and workflow events
+Execution > Evidence: Agent and tool events
+Verification > Evidence: Test and security evidence
+Release > Evidence: Approval and deployment evidence
+Evidence > Operator: Audit, telemetry and operations
+
+legend [position: bottom-left] {
+  [connection: >, label: "Governed delivery flow"]
+}
