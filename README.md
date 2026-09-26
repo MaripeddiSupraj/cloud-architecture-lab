@@ -1,8 +1,8 @@
 # Cloud Architecture Lab
 
-A portfolio of end-to-end cloud architecture engagements designed from business requirements through production operations.
+A portfolio of end-to-end cloud architecture engagements plus reusable architecture and delivery frameworks.
 
-The work in this repository follows the same decision sequence used in professional architecture reviews: understand the business, quantify the workload, identify quality attributes, evaluate options, record decisions, design the platform, and validate it against failure, security, cost, and operational scenarios.
+The repository separates **what a client system should run** from **how engineering work can be delivered**.
 
 ## Working principles
 
@@ -14,17 +14,42 @@ The work in this repository follows the same decision sequence used in professio
 - Cost is an architectural constraint.
 - Every major technology choice requires an ADR.
 - Complexity must be justified by measurable need.
-- Architecture is considered incomplete until deployment, observability, recovery, and operations are covered.
+- Architecture is incomplete until deployment, observability, recovery, and operations are covered.
 
-## Engagements
+## Client architecture engagements
 
 | Client | Domain | Status |
 |---|---|---|
 | [01 — Veyra Commerce](clients/01-veyra-commerce/README.md) | Digital commerce | Production design / implementation readiness |
-| [02 — RADF AI-Native SDLC](clients/02-radf-ai-native-sdlc/README.md) | Governed agentic software delivery | Evidence baseline / architecture decisions |
+
+Client folders answer:
+
+> **What production architecture does this workload need, and why?**
+
+They contain requirements, NFRs, capacity, architecture decisions, diagrams, security, reliability, FinOps, DR, and implementation readiness.
+
+## Reusable frameworks
+
+| Framework | Purpose | Status |
+|---|---|---|
+| [RADF — AI-Native SDLC](frameworks/radf-ai-native-sdlc/README.md) | How humans + AI agents safely deliver software from intent to production | Design-ready framework / reference implementation evolving |
+
+Framework folders answer a different question:
+
+> **How should a reusable engineering capability or operating model work across many clients and workloads?**
+
+RADF is therefore not "Client 02." A client or product may **adopt RADF** as its AI-native delivery framework while retaining its own independent cloud/application architecture.
 
 ## Repository model
 
-Each client engagement is maintained independently under `clients/`. Artifacts progress from discovery and capacity modelling to architecture decisions, detailed designs, delivery, resilience, security, FinOps, and operational readiness.
+```
+clients/
+  01-veyra-commerce/
+  future-client-architectures/
 
-> The organizations and business scenarios in this repository are fictional. The architecture process, constraints, artifacts, and engineering decisions are intentionally modelled after professional cloud architecture engagements.
+frameworks/
+  radf-ai-native-sdlc/
+  future-reusable-patterns/
+```
+
+The Veyra organization/scenario is fictional and used for architecture learning. RADF is based on the real Rithru Labs AI-native delivery framework and is represented here only at the level needed to explain its reusable architecture and implementation choices.
