@@ -5,91 +5,100 @@ typeface clean
 styleMode shadow
 colorMode pastel
 
-Customers [label: "Customers"] {
-  WebClient [icon: browser, label: "Web"]
-  MobileClient [icon: smartphone, label: "Mobile"]
+Channels [label: "Customer Channels"] {
+  Web [icon: browser, label: "Web"]
+  Mobile [icon: smartphone, label: "Mobile"]
 }
 
-AWSPlatform [label: "AWS Platform"] {
-  Edge [label: "Edge"] {
-    CloudFront [icon: aws-cloudfront, label: "CloudFront"]
-    WAF [icon: aws-waf, label: "AWS WAF"]
+GlobalEdge [label: "Global Edge"] {
+  DNS [label: "Route 53"]
+  CloudFront [icon: aws-cloudfront, label: "CloudFront"]
+  WAF [icon: aws-waf, label: "AWS WAF"]
+  Cognito [label: "Amazon Cognito"]
+}
+
+AWSRegion [label: "AWS Region - Mumbai"] {
+  Storage [label: "Object Storage"] {
+    Media [icon: aws-simple-storage-service, label: "S3 Product Media"]
   }
 
-  Media [label: "Object Storage"] {
-    ProductMedia [icon: aws-simple-storage-service, label: "S3 Product Media"]
-  }
-
-  VPC [label: "Application VPC"] {
-    Ingress [label: "Ingress"] {
+  VPC [label: "Production VPC"] {
+    Ingress [label: "Public Ingress"] {
       ALB [icon: aws-elb-application-load-balancer, label: "Application Load Balancer"]
     }
 
-    AppTier [label: "ECS Fargate Services"] {
+    Services [label: "Private ECS Fargate Services"] {
       Experience [icon: aws-fargate, label: "Experience API"]
       Catalog [icon: aws-fargate, label: "Catalog and Pricing"]
       Cart [icon: aws-fargate, label: "Cart"]
       Checkout [icon: aws-fargate, label: "Checkout and Orders"]
       Inventory [icon: aws-fargate, label: "Inventory"]
-      SearchIndexer [icon: aws-fargate, label: "Search Index Workers"]
-      IntegrationWorkers [icon: aws-fargate, label: "Integration Workers"]
     }
 
-    DataTier [label: "Data Services"] {
+    Data [label: "Managed Data Services"] {
       PostgreSQL [icon: aws-rds, label: "RDS PostgreSQL Multi-AZ"]
       Cache [icon: aws-elasticache, label: "ElastiCache Serverless for Valkey"]
       Search [icon: aws-opensearch-service, label: "OpenSearch Service"]
     }
   }
 
-  Async [label: "Async Integration"] {
+  Async [label: "Asynchronous Processing"] {
     EventBus [icon: aws-eventbridge, label: "EventBridge"]
-    WorkQueues [icon: aws-simple-queue-service, label: "SQS Work Queues"]
+    SearchQueue [icon: aws-simple-queue-service, label: "Search Index Queue"]
+    IntegrationQueue [icon: aws-simple-queue-service, label: "Integration Queue"]
+    SearchWorker [icon: aws-fargate, label: "Search Index Worker"]
+    IntegrationWorker [icon: aws-fargate, label: "Integration Worker"]
   }
 }
 
-ExternalSystems [label: "External Systems"] {
+External [label: "External Business Systems"] {
   Payment [label: "Payment Provider"]
   ERP [label: "ERP and Warehouse"]
   Delivery [label: "Courier and Tracking"]
   Notifications [label: "Email, SMS and Push"]
 }
 
-WebClient > CloudFront: HTTPS
-MobileClient > CloudFront: HTTPS
-CloudFront > WAF: Protected requests
-CloudFront > ProductMedia: Cacheable media
-WAF > ALB: Dynamic HTTPS
+Web > DNS: Resolve application endpoint
+Mobile > DNS: Resolve application endpoint
+DNS > CloudFront: Customer traffic
+CloudFront > WAF: Dynamic requests
+CloudFront > Media: Static and product media
+Web --> Cognito: Authenticate
+Mobile --> Cognito: Authenticate
 
+WAF > ALB: HTTPS
 ALB > Experience: Customer APIs
-Experience > Catalog: Catalog and pricing
+
+Experience > Catalog: Browse and pricing
 Experience > Cart: Cart operations
 Experience > Checkout: Checkout operations
 
-Catalog > Cache: Hot reads
-Catalog > PostgreSQL: Authoritative catalog state
-Catalog > Search: Product discovery
+Catalog > Cache: Hot read cache
+Catalog > PostgreSQL: Catalog truth
+Catalog > Search: Product search
 
 Cart > Cache: Hot cart state
 Cart > PostgreSQL: Durable cart state
 
+Checkout > Inventory: Reserve inventory
 Checkout > PostgreSQL: Order and payment state
-Checkout > Inventory: Reserve stock
-Inventory > PostgreSQL: Authoritative inventory state
+Inventory > PostgreSQL: Inventory and reservations
+Checkout > Payment: Payment request and reconciliation
 
-Checkout > EventBus: Order domain events
 Catalog > EventBus: Catalog domain events
-EventBus > WorkQueues: Route and buffer
-WorkQueues > SearchIndexer: Search work
-WorkQueues > IntegrationWorkers: Integration work
-SearchIndexer > Search: Idempotent indexing
+Checkout > EventBus: Order domain events
 
-Checkout > Payment: Payment request
-Payment > Checkout: Payment callback
-IntegrationWorkers > ERP: Inventory and fulfilment integration
-IntegrationWorkers > Delivery: Shipment integration
-IntegrationWorkers > Notifications: Notification delivery
+EventBus > SearchQueue: Search events
+SearchQueue > SearchWorker: Buffered indexing work
+SearchWorker > Search: Update derived index
+
+EventBus > IntegrationQueue: Fulfilment and notification events
+IntegrationQueue > IntegrationWorker: Buffered integration work
+IntegrationWorker > ERP: Warehouse integration
+IntegrationWorker > Delivery: Shipment integration
+IntegrationWorker > Notifications: Customer notifications
 
 legend [position: bottom-left] {
-  [connection: -->, label: "Request or event flow"]
+  [connection: -->, label: "Authentication or indirect flow"]
+  [connection: >, label: "Primary request or event flow"]
 }
