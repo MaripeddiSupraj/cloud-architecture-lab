@@ -1,0 +1,130 @@
+cloud-architecture-diagram
+
+direction right
+typeface clean
+styleMode shadow
+colorMode pastel
+
+Users [label: "Customer Channels"] {
+  Web [icon: browser, label: "Web"]
+  Mobile [icon: smartphone, label: "Mobile"]
+}
+
+Global [label: "Global Edge and Identity", color: blue] {
+  DNS [label: "Route 53"]
+  CloudFront [icon: aws-cloudfront, label: "CloudFront"]
+  WAF [icon: aws-waf, label: "AWS WAF"]
+  Cognito [label: "Cognito Lite"]
+}
+
+SoftwareDelivery [label: "Software Delivery", color: gray] {
+  GitHub [label: "GitHub Actions"]
+  ECR [label: "Amazon ECR"]
+}
+
+Primary [label: "Primary Region - Mumbai", color: green] {
+  Media [icon: aws-simple-storage-service, label: "S3 Product Media"]
+
+  VPC [label: "Production VPC - 3 AZs"] {
+    Entry [label: "Public Ingress"] {
+      ALB [icon: aws-elb-application-load-balancer, label: "Application Load Balancer"]
+    }
+
+    Apps [label: "Private ECS Fargate Services"] {
+      Experience [icon: aws-fargate, label: "Experience API"]
+      Catalog [icon: aws-fargate, label: "Catalog and Pricing"]
+      Cart [icon: aws-fargate, label: "Cart"]
+      Checkout [icon: aws-fargate, label: "Checkout and Orders"]
+      Inventory [icon: aws-fargate, label: "Inventory"]
+    }
+
+    Data [label: "Managed Data Layer"] {
+      RDS [icon: aws-rds, label: "RDS PostgreSQL Multi-AZ"]
+      Valkey [icon: aws-elasticache, label: "ElastiCache Valkey"]
+      OpenSearch [icon: aws-opensearch-service, label: "OpenSearch"]
+    }
+  }
+
+  Async [label: "Asynchronous Work"] {
+    Events [icon: aws-eventbridge, label: "EventBridge"]
+    Queues [icon: aws-simple-queue-service, label: "SQS Queues"]
+    Workers [icon: aws-fargate, label: "Fargate Workers"]
+  }
+
+  PlatformControls [label: "Security and Operations", color: purple] {
+    Secrets [label: "Secrets Manager"]
+    KMS [label: "KMS"]
+    Observability [label: "CloudWatch and OpenTelemetry"]
+  }
+}
+
+External [label: "External Business Systems", color: orange] {
+  Payment [label: "Payment Provider"]
+  ERP [label: "ERP and Warehouse"]
+  DeliveryProvider [label: "Courier and Tracking"]
+  Messaging [label: "Email, SMS and Push"]
+}
+
+DR [label: "DR Region - Hyderabad", color: yellow] {
+  DRDB [icon: aws-rds, label: "PostgreSQL Read Replica"]
+  DRS3 [icon: aws-simple-storage-service, label: "S3 Recovery Copy"]
+  DRECR [label: "ECR Replica"]
+  DRSecrets [label: "Secrets Replica"]
+  DRApps [icon: aws-fargate, label: "Pilot-light ECS"]
+}
+
+Web > DNS: Resolve endpoint
+Mobile > DNS: Resolve endpoint
+DNS > CloudFront: Customer traffic
+CloudFront > WAF: Protected dynamic traffic
+CloudFront > Media: Cached static and media content
+Web --> Cognito: Authenticate
+Mobile --> Cognito: Authenticate
+
+WAF > ALB: HTTPS
+ALB > Experience: Customer APIs
+
+Experience > Catalog: Browse and pricing
+Experience > Cart: Cart operations
+Experience > Checkout: Checkout operations
+
+Catalog > Valkey: Hot reads
+Catalog > OpenSearch: Product discovery
+Catalog > RDS: Authoritative catalog state
+
+Cart > Valkey: Hot state
+Cart > RDS: Durable cart state
+
+Checkout > Inventory: Reserve stock
+Checkout > RDS: Orders and payment state
+Inventory > RDS: Authoritative inventory state
+Checkout > Payment: Idempotent payment workflow
+
+Catalog > Events: Catalog events
+Checkout > Events: Order events
+Events > Queues: Route and buffer
+Queues > Workers: Async processing
+Workers > OpenSearch: Search indexing
+Workers > ERP: Fulfilment integration
+Workers > DeliveryProvider: Shipment integration
+Workers > Messaging: Notifications
+
+Secrets > Apps: Runtime secrets
+KMS > Data: Encryption controls
+Apps > Observability: Metrics, logs and traces
+
+GitHub > ECR: Build once and publish image
+ECR > Apps: Promote immutable digest
+
+RDS > DRDB: Async cross-Region replication
+Media > DRS3: Recovery replication
+ECR > DRECR: Image replication
+Secrets > DRSecrets: Secret replication
+DRECR > DRApps: Recovery images
+
+legend [position: bottom-left] {
+  [connection: >, label: "Primary request or data flow"]
+  [connection: -->, label: "Authentication or recovery flow"]
+  [color: green, label: "Primary Region"]
+  [color: yellow, label: "DR Region"]
+}
