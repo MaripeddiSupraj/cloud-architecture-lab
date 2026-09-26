@@ -1,0 +1,61 @@
+cloud-architecture-diagram
+
+direction right
+typeface clean
+styleMode shadow
+colorMode pastel
+
+Global Entry [color: blue] {
+  DNS [label: "Route 53"]
+  CloudFront [icon: aws-cloudfront]
+}
+
+Primary Mumbai [color: green] {
+  PrimaryApp [icon: aws-fargate, label: "ECS/Fargate • ap-south-1"]
+  PrimaryDB [icon: aws-rds, label: "RDS PostgreSQL Multi-AZ"]
+  PrimaryS3 [icon: aws-simple-storage-service, label: "S3"]
+  PrimaryECR [label: "ECR"]
+  PrimarySecrets [label: "Secrets Manager"]
+}
+
+DR Hyderabad [color: orange] {
+  DRNetwork [label: "Pre-provisioned VPC / ALB / IAM"]
+  DRApp [icon: aws-fargate, label: "ECS Services\nscaled minimal until failover"]
+  DRDB [icon: aws-rds, label: "Cross-Region Read Replica"]
+  DRS3 [icon: aws-simple-storage-service, label: "S3 Replica / Recovery Copy"]
+  DRECR [label: "ECR Replica"]
+  DRSecrets [label: "Secrets Replica"]
+}
+
+Recovery Control [color: red] {
+  Runbook [label: "Automated DR Runbook"]
+  Health [label: "Health + Replication Checks"]
+  Decision [label: "Human-authorized Regional Failover"]
+}
+
+DNS > CloudFront
+CloudFront > PrimaryApp: Normal traffic
+PrimaryApp > PrimaryDB
+PrimaryApp > PrimaryS3
+
+PrimaryDB > DRDB: Async cross-Region replication
+PrimaryS3 > DRS3: Replication / backup copy
+PrimaryECR > DRECR: Image replication
+PrimarySecrets > DRSecrets: Secret replication
+
+Health > PrimaryApp, PrimaryDB, DRDB
+Health > Decision
+Decision > Runbook: Declare Regional disaster
+Runbook > DRDB: Promote replica
+Runbook > DRApp: Scale services
+DRECR > DRApp: Pull known-good images
+DRSecrets > DRApp: Regional secrets
+DRApp > DRDB
+DRApp > DRS3
+Runbook > CloudFront: Switch healthy origin / routing
+
+legend [position: bottom-left] {
+  [color: green, label: "Primary Region"]
+  [color: orange, label: "DR Region"]
+  [color: red, label: "Recovery control"]
+}
