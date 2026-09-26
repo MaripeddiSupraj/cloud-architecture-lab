@@ -33,6 +33,7 @@ ADRs capture decisions that materially affect system structure, operational burd
 | [ADR-017](ADR-017-infrastructure-as-code.md) | Infrastructure as Code and configuration | Accepted |
 | [ADR-018](ADR-018-region-strategy.md) | Region and geographic expansion strategy | Accepted |
 | [ADR-019](ADR-019-scaling-capacity-strategy.md) | Scaling and peak-event capacity strategy | Accepted |
+| [ADR-020](ADR-020-cognito-feature-tier.md) | Cognito feature tier | Accepted |
 
 ## ADR acceptance rule
 
