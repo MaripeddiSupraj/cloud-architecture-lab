@@ -5,80 +5,98 @@ typeface clean
 styleMode shadow
 colorMode pastel
 
-Internet [icon: globe, color: gray]
+Internet [icon: globe, label: "Internet"]
 
-AWS Edge [color: blue] {
+Edge [label: "AWS Edge", color: blue] {
   DNS [label: "Route 53"]
-  CloudFront [icon: aws-cloudfront]
-  WAF [icon: aws-waf]
+  CloudFront [icon: aws-cloudfront, label: "CloudFront"]
+  WAF [icon: aws-waf, label: "AWS WAF"]
 }
 
-VPC [color: teal] {
-  Public Ingress [color: blue] {
-    ALB [label: "Public ALB"]
-    NAT_A [label: "NAT Gateway • AZ-A"]
-    NAT_B [label: "NAT Gateway • AZ-B"]
-    NAT_C [label: "NAT Gateway • AZ-C"]
+VPC [label: "Production VPC - 3 Availability Zones", color: teal] {
+  PublicTier [label: "Public Ingress and Egress", color: blue] {
+    ALB [icon: aws-elb-application-load-balancer, label: "Public ALB"]
+    NATA [label: "NAT Gateway AZ-A"]
+    NATB [label: "NAT Gateway AZ-B"]
+    NATC [label: "NAT Gateway AZ-C"]
   }
 
-  Private Application [color: green] {
-    ECS_A [icon: aws-fargate, label: "ECS/Fargate • AZ-A"]
-    ECS_B [icon: aws-fargate, label: "ECS/Fargate • AZ-B"]
-    ECS_C [icon: aws-fargate, label: "ECS/Fargate • AZ-C"]
+  AppTier [label: "Private Application Tier", color: green] {
+    ECSA [icon: aws-fargate, label: "ECS Fargate AZ-A"]
+    ECSB [icon: aws-fargate, label: "ECS Fargate AZ-B"]
+    ECSC [icon: aws-fargate, label: "ECS Fargate AZ-C"]
   }
 
-  Isolated Data [color: purple] {
-    RDS [icon: aws-rds, label: "RDS PostgreSQL • Multi-AZ"]
-    Valkey [icon: aws-elasticache, label: "ElastiCache / Valkey"]
-    OpenSearch [icon: aws-opensearch-service]
+  DataTier [label: "Isolated Data Tier", color: purple] {
+    RDS [icon: aws-rds, label: "RDS PostgreSQL Multi-AZ"]
+    Valkey [icon: aws-elasticache, label: "ElastiCache Valkey"]
+    OpenSearch [icon: aws-opensearch-service, label: "OpenSearch Service"]
   }
 
-  Private AWS Access [color: yellow] {
+  PrivateAccess [label: "Private AWS Service Access", color: yellow] {
     S3Endpoint [label: "S3 Gateway Endpoint"]
-    PrivateEndpoints [label: "Interface Endpoints\nECR • Secrets • Logs"]
+    InterfaceEndpoints [label: "Interface Endpoints"]
   }
 }
 
-Security Services [color: red] {
+Security [label: "Security Controls", color: red] {
   Secrets [label: "Secrets Manager"]
-  KMS [label: "KMS"]
+  KMS [label: "AWS KMS"]
   TaskRoles [label: "ECS Task IAM Roles"]
   CloudTrail [label: "CloudTrail"]
 }
 
-External Providers [color: orange] {
+Providers [label: "External Providers", color: orange] {
   Payment [label: "Payment Provider"]
-  ERP [label: "ERP / Warehouse"]
-  Messaging [label: "Email / SMS / Push"]
+  ERP [label: "ERP and Warehouse"]
+  Messaging [label: "Email, SMS and Push"]
 }
 
-Internet > DNS > CloudFront > WAF > ALB: HTTPS
-ALB > ECS_A, ECS_B, ECS_C: App SG only
+Internet > DNS: DNS lookup
+DNS > CloudFront: Public entry
+CloudFront > WAF: Protected request
+WAF > ALB: HTTPS only
 
-ECS_A > RDS: PostgreSQL/TLS
-ECS_B > RDS: PostgreSQL/TLS
-ECS_C > RDS: PostgreSQL/TLS
-ECS_A > Valkey, OpenSearch
-ECS_B > Valkey, OpenSearch
-ECS_C > Valkey, OpenSearch
+ALB > ECSA: Application security group
+ALB > ECSB: Application security group
+ALB > ECSC: Application security group
 
-ECS_A > S3Endpoint, PrivateEndpoints: Private AWS traffic
-ECS_B > S3Endpoint, PrivateEndpoints: Private AWS traffic
-ECS_C > S3Endpoint, PrivateEndpoints: Private AWS traffic
+ECSA > RDS: PostgreSQL over TLS
+ECSB > RDS: PostgreSQL over TLS
+ECSC > RDS: PostgreSQL over TLS
+ECSA > Valkey: Cache access
+ECSB > Valkey: Cache access
+ECSC > Valkey: Cache access
+ECSA > OpenSearch: Search access
+ECSB > OpenSearch: Search access
+ECSC > OpenSearch: Search access
 
-TaskRoles > ECS_A, ECS_B, ECS_C: Short-lived AWS credentials
-Secrets > ECS_A, ECS_B, ECS_C: Runtime secrets
-KMS > RDS, Valkey, OpenSearch: Encryption controls
+ECSA > S3Endpoint: Private S3 access
+ECSB > S3Endpoint: Private S3 access
+ECSC > S3Endpoint: Private S3 access
+ECSA > InterfaceEndpoints: Private AWS API access
+ECSB > InterfaceEndpoints: Private AWS API access
+ECSC > InterfaceEndpoints: Private AWS API access
 
-ECS_A > NAT_A: Internet egress
-ECS_B > NAT_B: Internet egress
-ECS_C > NAT_C: Internet egress
-NAT_A > Payment, ERP, Messaging
-NAT_B > Payment, ERP, Messaging
-NAT_C > Payment, ERP, Messaging
+TaskRoles > ECSA: Temporary AWS credentials
+TaskRoles > ECSB: Temporary AWS credentials
+TaskRoles > ECSC: Temporary AWS credentials
+Secrets > ECSA: Runtime secrets
+Secrets > ECSB: Runtime secrets
+Secrets > ECSC: Runtime secrets
+KMS > RDS: Encryption at rest
+KMS > Valkey: Encryption at rest
+KMS > OpenSearch: Encryption at rest
+
+ECSA > NATA: Internet egress
+ECSB > NATB: Internet egress
+ECSC > NATC: Internet egress
+NATA > Payment: Provider calls
+NATB > ERP: Enterprise integration
+NATC > Messaging: Notification provider calls
 
 legend [position: bottom-left] {
-  [color: blue, label: "Public / edge"]
+  [color: blue, label: "Public and edge"]
   [color: green, label: "Private application"]
   [color: purple, label: "Data"]
   [color: red, label: "Security controls"]
