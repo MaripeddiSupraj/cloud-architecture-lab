@@ -15,6 +15,7 @@ The architecture is intentionally represented by multiple diagrams. A single "ev
 | [06 — CI/CD & release](06-cicd-release.eraserdiagram) | How does code safely become production? |
 | [07 — Observability & operations](07-observability-operations.eraserdiagram) | How do teams detect customer impact and diagnose failures? |
 | [08 — Disaster recovery](08-disaster-recovery.eraserdiagram) | How does the platform recover from a Region-level outage? |
+| [09 — Production reference architecture](09-production-reference-architecture.eraserdiagram) | What is the final one-page production architecture for review and presentation? |
 
 ## Visual rules
 
