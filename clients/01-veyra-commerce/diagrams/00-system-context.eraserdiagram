@@ -5,38 +5,38 @@ typeface clean
 styleMode shadow
 colorMode pastel
 
-Customers {
-  Web Customer [icon: user]
-  Mobile Customer [icon: smartphone]
+Customers [label: "Customers"] {
+  WebCustomer [icon: user, label: "Web Customer"]
+  MobileCustomer [icon: smartphone, label: "Mobile Customer"]
 }
 
-Veyra Digital Commerce {
-  Digital Experience [label: "Web + Mobile Experience"]
-  Commerce Platform [label: "Commerce Platform"]
-  Operations Portal [label: "Operations & Admin"]
+Veyra [label: "Veyra Digital Commerce"] {
+  DigitalExperience [label: "Web and Mobile Experience"]
+  CommercePlatform [label: "Commerce Platform"]
+  OperationsPortal [label: "Operations and Admin"]
 }
 
-Enterprise Systems {
-  ERP WMS [label: "ERP / Warehouse"]
+Enterprise [label: "Enterprise Systems"] {
+  ERPWarehouse [label: "ERP and Warehouse"]
 }
 
-External Providers {
-  Payment Provider [label: "Payment Service Provider"]
-  Delivery Partners [label: "Courier / Tracking"]
-  Messaging Providers [label: "Email / SMS / Push"]
+Providers [label: "External Providers"] {
+  PaymentProvider [label: "Payment Service Provider"]
+  DeliveryProvider [label: "Courier and Tracking"]
+  MessagingProvider [label: "Email, SMS and Push"]
 }
 
-Web Customer > Digital Experience
-Mobile Customer > Digital Experience
-Digital Experience > Commerce Platform: Customer APIs
-Operations Portal > Commerce Platform: Admin APIs
-Commerce Platform > ERP WMS: Inventory / fulfilment
-Commerce Platform > Payment Provider: Payment request
-Payment Provider > Commerce Platform: Payment result / callback
-Commerce Platform > Delivery Partners: Shipment operations
-Delivery Partners > Commerce Platform: Tracking events
-Commerce Platform > Messaging Providers: Notification requests
+WebCustomer > DigitalExperience: Customer journey
+MobileCustomer > DigitalExperience: Customer journey
+DigitalExperience > CommercePlatform: Customer APIs
+OperationsPortal > CommercePlatform: Admin APIs
+CommercePlatform > ERPWarehouse: Inventory and fulfilment
+CommercePlatform > PaymentProvider: Payment request
+PaymentProvider > CommercePlatform: Payment result and callback
+CommercePlatform > DeliveryProvider: Shipment operations
+DeliveryProvider > CommercePlatform: Tracking events
+CommercePlatform > MessagingProvider: Notification requests
 
 legend [position: bottom-left] {
-  [connection: -->, label: "Request / event"]
+  [connection: -->, label: "Request or event"]
 }
