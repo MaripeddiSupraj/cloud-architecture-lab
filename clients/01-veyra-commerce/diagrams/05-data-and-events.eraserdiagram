@@ -1,0 +1,63 @@
+cloud-architecture-diagram
+
+direction right
+typeface clean
+styleMode shadow
+colorMode pastel
+
+Domain Services [color: green] {
+  Catalog [label: "Catalog & Pricing"]
+  Checkout [label: "Checkout & Orders"]
+  Inventory [label: "Inventory"]
+}
+
+Authoritative State [color: purple] {
+  PostgreSQL [icon: aws-rds, label: "RDS PostgreSQL\nSystem of Record"]
+}
+
+Transaction-to-Event Bridge [color: yellow] {
+  Outbox [label: "Transactional Outbox"]
+  Relay [label: "Outbox Relay"]
+  EventBridge [icon: aws-eventbridge]
+}
+
+Consumer Buffers [color: orange] {
+  SearchQueue [icon: aws-simple-queue-service, label: "Search Index Queue"]
+  FulfilmentQueue [icon: aws-simple-queue-service, label: "Fulfilment Queue"]
+  NotificationQueue [icon: aws-simple-queue-service, label: "Notification Queue"]
+  AnalyticsQueue [icon: aws-simple-queue-service, label: "Analytics Queue"]
+}
+
+Derived / Ephemeral State [color: blue] {
+  Search [icon: aws-opensearch-service, label: "OpenSearch\nDerived Index"]
+  Cache [icon: aws-elasticache, label: "Valkey\nCache / Ephemeral"]
+}
+
+External [color: gray] {
+  ERP [label: "ERP / Warehouse"]
+  Notifications [label: "Messaging Providers"]
+  Analytics [label: "Analytics Platform"]
+}
+
+Catalog > PostgreSQL: Catalog truth
+Checkout > PostgreSQL: Orders / payment state
+Inventory > PostgreSQL: Inventory / reservations
+
+Catalog > Cache: Cache-aside
+Checkout > Cache: Safe ephemeral data
+
+PostgreSQL > Outbox: Same DB transaction
+Outbox > Relay: Poll / claim committed events
+Relay > EventBridge: Publish domain events
+
+EventBridge > SearchQueue, FulfilmentQueue, NotificationQueue, AnalyticsQueue: Route + fan-out
+SearchQueue > Search: Idempotent indexing
+FulfilmentQueue > ERP: Async integration
+NotificationQueue > Notifications: Async delivery
+AnalyticsQueue > Analytics: Async events
+
+legend [position: bottom-left] {
+  [color: purple, label: "Authoritative"]
+  [color: blue, label: "Derived / ephemeral"]
+  [connection: -->, label: "Request / event"]
+}
