@@ -5,57 +5,60 @@ typeface clean
 styleMode shadow
 colorMode pastel
 
-Global Entry [color: blue] {
+GlobalEntry [label: "Global Entry", color: blue] {
   DNS [label: "Route 53"]
-  CloudFront [icon: aws-cloudfront]
+  CloudFront [icon: aws-cloudfront, label: "CloudFront"]
 }
 
-Primary Mumbai [color: green] {
-  PrimaryApp [icon: aws-fargate, label: "ECS/Fargate • ap-south-1"]
+Primary [label: "Primary Region - Mumbai", color: green] {
+  PrimaryApp [icon: aws-fargate, label: "ECS Fargate"]
   PrimaryDB [icon: aws-rds, label: "RDS PostgreSQL Multi-AZ"]
   PrimaryS3 [icon: aws-simple-storage-service, label: "S3"]
   PrimaryECR [label: "ECR"]
   PrimarySecrets [label: "Secrets Manager"]
 }
 
-DR Hyderabad [color: orange] {
-  DRNetwork [label: "Pre-provisioned VPC / ALB / IAM"]
-  DRApp [icon: aws-fargate, label: "ECS Services\nscaled minimal until failover"]
+DR [label: "DR Region - Hyderabad", color: orange] {
+  DRNetwork [label: "Pre-provisioned VPC, ALB and IAM"]
+  DRApp [icon: aws-fargate, label: "ECS Fargate Standby"]
   DRDB [icon: aws-rds, label: "Cross-Region Read Replica"]
-  DRS3 [icon: aws-simple-storage-service, label: "S3 Replica / Recovery Copy"]
+  DRS3 [icon: aws-simple-storage-service, label: "S3 Recovery Copy"]
   DRECR [label: "ECR Replica"]
   DRSecrets [label: "Secrets Replica"]
 }
 
-Recovery Control [color: red] {
-  Runbook [label: "Automated DR Runbook"]
-  Health [label: "Health + Replication Checks"]
+Recovery [label: "Recovery Control", color: red] {
+  Health [label: "Health and Replication Checks"]
   Decision [label: "Human-authorized Regional Failover"]
+  Runbook [label: "Automated DR Runbook"]
 }
 
-DNS > CloudFront
+DNS > CloudFront: Customer entry
 CloudFront > PrimaryApp: Normal traffic
-PrimaryApp > PrimaryDB
-PrimaryApp > PrimaryS3
+PrimaryApp > PrimaryDB: Transactional access
+PrimaryApp > PrimaryS3: Object access
 
-PrimaryDB > DRDB: Async cross-Region replication
-PrimaryS3 > DRS3: Replication / backup copy
+PrimaryDB > DRDB: Asynchronous cross-Region replication
+PrimaryS3 > DRS3: Replication and recovery copy
 PrimaryECR > DRECR: Image replication
 PrimarySecrets > DRSecrets: Secret replication
 
-Health > PrimaryApp, PrimaryDB, DRDB
-Health > Decision
-Decision > Runbook: Declare Regional disaster
+Health > PrimaryApp: Check application health
+Health > PrimaryDB: Check primary database
+Health > DRDB: Check replication lag
+Health > Decision: Provide recovery evidence
+Decision > Runbook: Declare regional disaster
+
 Runbook > DRDB: Promote replica
-Runbook > DRApp: Scale services
+Runbook > DRApp: Scale recovery services
 DRECR > DRApp: Pull known-good images
-DRSecrets > DRApp: Regional secrets
-DRApp > DRDB
-DRApp > DRS3
-Runbook > CloudFront: Switch healthy origin / routing
+DRSecrets > DRApp: Load regional secrets
+DRApp > DRDB: Transactional access
+DRApp > DRS3: Object access
+Runbook > CloudFront: Switch origin to recovery region
 
 legend [position: bottom-left] {
-  [color: green, label: "Primary Region"]
-  [color: orange, label: "DR Region"]
+  [color: green, label: "Primary region"]
+  [color: orange, label: "Recovery region"]
   [color: red, label: "Recovery control"]
 }
