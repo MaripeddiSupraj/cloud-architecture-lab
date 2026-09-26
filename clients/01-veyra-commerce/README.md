@@ -3,7 +3,7 @@
 **Domain:** Digital commerce  
 **Channels:** Web, iOS, Android  
 **Primary launch market:** India  
-**Engagement phase:** Architecture definition / production design
+**Engagement phase:** Production design / implementation readiness
 
 ## Engagement objective
 
@@ -38,6 +38,7 @@ Architecture decisions start from requirements and workload characteristics. AWS
 - [Initial AWS platform HLD](architecture/02-initial-aws-platform-hld.md)
 - [Service selection matrix](architecture/03-service-selection-matrix.md)
 - [All Eraser diagrams](diagrams/README.md)
+- [Golden production reference architecture](diagrams/09-production-reference-architecture.eraserdiagram)
 
 The diagram set includes system context, AWS HLD, network/security, checkout/payment, payment recovery, data/events, CI/CD, observability, and disaster recovery.
 
@@ -60,6 +61,7 @@ The diagram set includes system context, AWS HLD, network/security, checkout/pay
 - [FinOps cost model and guardrails](finops/01-cost-model-and-guardrails.md)
 - [AWS pricing workbook](finops/02-pricing-workbook.md)
 - [Cost optimization decisions](finops/03-cost-optimization-decisions.md)
+- [Planning-grade monthly cost estimate](finops/04-planning-grade-cost-estimate.md)
 
 ## Architecture principle
 
@@ -69,3 +71,14 @@ For every major component the repository records:
 **requirement -> workload -> options -> trade-offs -> decision -> validation -> revisit trigger**.
 
 The capacity model now contains a first numerical workload envelope and service-sizing hypothesis. The next evidence gate is **benchmark + calculator validation**: representative ECS load tests, PostgreSQL connection/IO tests, OpenSearch and Valkey benchmarks, media/CDN transfer measurement, Cognito feature-tier confirmation, and an AWS Pricing Calculator estimate for Mumbai/Hyderabad. Those measurements may change accepted sizing or even reopen an ADR.
+
+
+## Implementation and readiness
+
+- [Terraform implementation blueprint](implementation/01-terraform-blueprint.md)
+- [Failure experiment plan](reliability/01-failure-experiment-plan.md)
+- [Production readiness checklist](readiness/01-production-readiness-checklist.md)
+
+## Current maturity
+
+The architecture is now complete enough for an implementation prototype. The remaining evidence is deliberately operational: benchmark the sizing assumptions, reproduce the AWS Calculator estimate, deploy the Terraform slices in non-production, execute failure experiments, and close the readiness checklist before treating the design as production-approved.
