@@ -20,7 +20,8 @@ The work in this repository follows the same decision sequence used in professio
 
 | Client | Domain | Status |
 |---|---|---|
-| [01 — Veyra Commerce](clients/01-veyra-commerce/README.md) | Digital commerce | Architecture definition / production design |
+| [01 — Veyra Commerce](clients/01-veyra-commerce/README.md) | Digital commerce | Production design / implementation readiness |
+| [02 — RADF AI-Native SDLC](clients/02-radf-ai-native-sdlc/README.md) | Governed agentic software delivery | Evidence baseline / architecture decisions |
 
 ## Repository model
 
