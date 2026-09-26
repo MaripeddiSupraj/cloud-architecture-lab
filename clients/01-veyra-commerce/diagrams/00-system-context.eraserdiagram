@@ -1,0 +1,42 @@
+cloud-architecture-diagram
+
+direction right
+typeface clean
+styleMode shadow
+colorMode pastel
+
+Customers {
+  Web Customer [icon: user]
+  Mobile Customer [icon: smartphone]
+}
+
+Veyra Digital Commerce {
+  Digital Experience [label: "Web + Mobile Experience"]
+  Commerce Platform [label: "Commerce Platform"]
+  Operations Portal [label: "Operations & Admin"]
+}
+
+Enterprise Systems {
+  ERP WMS [label: "ERP / Warehouse"]
+}
+
+External Providers {
+  Payment Provider [label: "Payment Service Provider"]
+  Delivery Partners [label: "Courier / Tracking"]
+  Messaging Providers [label: "Email / SMS / Push"]
+}
+
+Web Customer > Digital Experience
+Mobile Customer > Digital Experience
+Digital Experience > Commerce Platform: Customer APIs
+Operations Portal > Commerce Platform: Admin APIs
+Commerce Platform > ERP WMS: Inventory / fulfilment
+Commerce Platform > Payment Provider: Payment request
+Payment Provider > Commerce Platform: Payment result / callback
+Commerce Platform > Delivery Partners: Shipment operations
+Delivery Partners > Commerce Platform: Tracking events
+Commerce Platform > Messaging Providers: Notification requests
+
+legend [position: bottom-left] {
+  [connection: -->, label: "Request / event"]
+}
