@@ -1,0 +1,95 @@
+cloud-architecture-diagram
+
+direction right
+typeface clean
+styleMode shadow
+colorMode pastel
+
+Customers {
+  Web [icon: browser]
+  Mobile [icon: smartphone]
+}
+
+AWS {
+  Edge {
+    CloudFront [icon: aws-cloudfront]
+    WAF [icon: aws-waf]
+  }
+
+  Object Storage {
+    Product Media [icon: aws-simple-storage-service, label: "S3 Product Media"]
+  }
+
+  VPC {
+    Ingress {
+      ALB [icon: aws-elb-application-load-balancer, label: "Application Load Balancer"]
+    }
+
+    Application {
+      Experience [icon: aws-fargate, label: "Experience / Commerce API"]
+      Catalog [icon: aws-fargate, label: "Catalog & Pricing"]
+      Cart [icon: aws-fargate]
+      Checkout [icon: aws-fargate, label: "Checkout & Orders"]
+      Inventory [icon: aws-fargate]
+      SearchIndexer [icon: aws-fargate, label: "Search / Index Workers"]
+      IntegrationWorkers [icon: aws-fargate, label: "Integration Workers"]
+    }
+
+    Data {
+      PostgreSQL [icon: aws-rds, label: "RDS PostgreSQL Multi-AZ"]
+      Cache [icon: aws-elasticache, label: "ElastiCache Serverless / Valkey"]
+      Search [icon: aws-opensearch-service, label: "OpenSearch Service"]
+    }
+  }
+
+  Integration {
+    EventBus [icon: aws-eventbridge, label: "EventBridge"]
+    WorkQueues [icon: aws-simple-queue-service, label: "SQS Work Queues"]
+  }
+}
+
+External {
+  Payment [label: "Payment Provider"]
+  ERP [label: "ERP / Warehouse"]
+  Delivery [label: "Courier / Tracking"]
+  Notifications [label: "Email / SMS / Push"]
+}
+
+Web > CloudFront
+Mobile > CloudFront
+CloudFront > WAF
+CloudFront > Product Media: Cacheable media
+WAF > ALB: Dynamic HTTPS
+
+ALB > Experience
+Experience > Catalog
+Experience > Cart
+Experience > Checkout
+
+Catalog > Cache: Hot reads
+Catalog > PostgreSQL: Authoritative catalog data
+Catalog > Search: Product discovery
+
+Cart > Cache: Ephemeral / hot state
+Cart > PostgreSQL: Durable cart data when required
+
+Checkout > PostgreSQL: Orders / payment state
+Checkout > Inventory: Reserve / commit
+Inventory > PostgreSQL: Authoritative inventory state
+
+Checkout > EventBus: Domain events
+Catalog > EventBus: Catalog events
+EventBus > WorkQueues: Route / buffer
+WorkQueues > SearchIndexer
+WorkQueues > IntegrationWorkers
+SearchIndexer > Search: Idempotent indexing
+
+Checkout > Payment: Payment request
+Payment > Checkout: Callback / result
+IntegrationWorkers > ERP
+IntegrationWorkers > Delivery
+IntegrationWorkers > Notifications
+
+legend [position: bottom-left] {
+  [connection: -->, label: "Request / event flow"]
+}
