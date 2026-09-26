@@ -5,23 +5,23 @@ styleMode shadow
 colorMode pastel
 autoNumber on
 
-Customer [icon: user] > CommerceAPI [label: "Commerce API"]: POST /checkout + Idempotency-Key
-CommerceAPI > Checkout [label: "Checkout & Orders"]: Validate request
+Customer [icon: user, label: "Customer"] > CommerceAPI [label: "Commerce API"]: Submit checkout with idempotency key
+CommerceAPI > Checkout [label: "Checkout and Orders"]: Validate request
 Checkout > Database [icon: aws-rds, label: "PostgreSQL"]: Find existing idempotency result
-Database --> Checkout: No prior result
-Checkout > Inventory [label: "Inventory Service"]: Reserve SKU quantities
-Inventory > Database: Atomic conditional stock update + reservation
+Database --> Checkout: No existing result
+Checkout > Inventory [label: "Inventory Service"]: Reserve requested quantities
+Inventory > Database: Atomically reserve available stock
 Database --> Inventory: Reservation committed
-Inventory --> Checkout: reservation_id
-Checkout > Database: Create order=PENDING_PAYMENT
-Database --> Checkout: order_id
-Checkout > Payment [label: "Payment Provider"]: Create payment(order_id, idempotency key)
-Payment --> Checkout: payment_authorized
-Checkout > Database: Transaction: mark PAID + write outbox event
-Database --> Checkout: Commit
+Inventory --> Checkout: Return reservation identifier
+Checkout > Database: Create order in pending payment state
+Database --> Checkout: Return order identifier
+Checkout > Payment [label: "Payment Provider"]: Create payment using stable merchant reference
+Payment --> Checkout: Payment authorized
+Checkout > Database: Commit paid state and transactional outbox event
+Database --> Checkout: Commit complete
 Checkout --> CommerceAPI: Order confirmed
-CommerceAPI --> Customer: 200 order_id + confirmed status
+CommerceAPI --> Customer: Return confirmed order
 Checkout > OutboxRelay [label: "Outbox Relay"]: Read committed event
-OutboxRelay > EventBus [icon: aws-eventbridge, label: "EventBridge"]: OrderPaid
-EventBus > Workers [icon: aws-simple-queue-service, label: "SQS Consumers"]: Async fan-out
-Workers --> Checkout: Fulfilment / notification / analytics proceed asynchronously
+OutboxRelay > EventBus [icon: aws-eventbridge, label: "EventBridge"]: Publish OrderPaid event
+EventBus > Workers [icon: aws-simple-queue-service, label: "SQS Consumers"]: Route asynchronous work
+Workers --> Checkout: Fulfilment, notification and analytics continue asynchronously
