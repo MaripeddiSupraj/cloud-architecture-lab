@@ -5,67 +5,70 @@ typeface clean
 styleMode shadow
 colorMode pastel
 
-Production Workloads [color: green] {
-  ECS [icon: aws-fargate, label: "ECS/Fargate Services"]
-  ALB [label: "Application Load Balancer"]
+Workloads [label: "Production Workloads", color: green] {
+  ECS [icon: aws-fargate, label: "ECS Fargate Services"]
+  ALB [icon: aws-elb-application-load-balancer, label: "Application Load Balancer"]
   RDS [icon: aws-rds, label: "RDS PostgreSQL"]
   Queues [icon: aws-simple-queue-service, label: "SQS"]
   Cache [icon: aws-elasticache, label: "Valkey"]
 }
 
-Telemetry [color: blue] {
-  OTel [label: "OpenTelemetry / ADOT"]
+Telemetry [label: "Telemetry Pipeline", color: blue] {
+  OTel [label: "OpenTelemetry and ADOT"]
   Metrics [label: "CloudWatch Metrics"]
   Logs [label: "CloudWatch Logs"]
   Traces [label: "Distributed Traces"]
   ContainerInsights [label: "Container Insights"]
 }
 
-Service Health [color: purple] {
-  SLO [label: "SLIs / SLOs"]
-  Dashboards [label: "Service + Business Dashboards"]
+Health [label: "Service Health", color: purple] {
+  SLO [label: "SLIs and SLOs"]
+  Dashboards [label: "Service and Business Dashboards"]
   Alarms [label: "Actionable Alarms"]
 }
 
-Operations [color: orange] {
-  OnCall [label: "On-call"]
+Operations [label: "Operations", color: orange] {
+  OnCall [label: "On-call Engineer"]
   Runbooks [label: "Runbooks"]
-  Incident [label: "Incident / Postmortem"]
+  Incident [label: "Incident Review"]
 }
 
-Business Signals [color: yellow] {
+Business [label: "Business Signals", color: yellow] {
   CheckoutRate [label: "Checkout Success Rate"]
-  PaymentUnknown [label: "Payment UNKNOWN Age/Count"]
+  PaymentUnknown [label: "Unknown Payment Age and Count"]
   QueueAge [label: "Oldest Queue Message"]
   SearchLag [label: "Search Index Lag"]
 }
 
-ECS > OTel: App metrics / traces
-ECS > Logs: Structured logs
-ALB > Metrics
-RDS > Metrics
-Queues > Metrics
-Cache > Metrics
-OTel > Metrics, Traces
-ECS > ContainerInsights
+ECS > OTel: Application metrics and traces
+ECS > Logs: Structured application logs
+ECS > ContainerInsights: Container telemetry
+ALB > Metrics: Request and target metrics
+RDS > Metrics: Database metrics
+Queues > Metrics: Queue metrics
+Cache > Metrics: Cache metrics
 
-Metrics > SLO
-Logs > Dashboards
-Traces > Dashboards
-ContainerInsights > Dashboards
+OTel > Metrics: Export application metrics
+OTel > Traces: Export traces
 
-CheckoutRate > SLO
-PaymentUnknown > Alarms
-QueueAge > Alarms
-SearchLag > Alarms
-SLO > Dashboards, Alarms
+Metrics > SLO: Technical indicators
+Logs > Dashboards: Search and correlation
+Traces > Dashboards: Request diagnosis
+ContainerInsights > Dashboards: Runtime diagnosis
 
-Alarms > OnCall
-OnCall > Runbooks
-Runbooks > Incident
-Incident > SLO: Improvement feedback
+CheckoutRate > SLO: Customer success indicator
+PaymentUnknown > Alarms: Reconciliation risk
+QueueAge > Alarms: Backlog risk
+SearchLag > Alarms: Freshness risk
+SLO > Dashboards: SLO status
+SLO > Alarms: Burn-rate alerting
+
+Alarms > OnCall: Page actionable incidents
+OnCall > Runbooks: Execute response
+Runbooks > Incident: Record response and outcome
+Incident > SLO: Feed improvements back
 
 legend [position: bottom-left] {
-  [color: yellow, label: "Business/customer signal"]
+  [color: yellow, label: "Business or customer signal"]
   [color: orange, label: "Human operations"]
 }
