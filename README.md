@@ -20,7 +20,7 @@ The work in this repository follows the same decision sequence used in professio
 
 | Client | Domain | Status |
 |---|---|---|
-| [01 — Veyra Commerce](clients/01-veyra-commerce/README.md) | Digital commerce | Discovery & requirements |
+| [01 — Veyra Commerce](clients/01-veyra-commerce/README.md) | Digital commerce | Architecture definition / production design |
 
 ## Repository model
 
